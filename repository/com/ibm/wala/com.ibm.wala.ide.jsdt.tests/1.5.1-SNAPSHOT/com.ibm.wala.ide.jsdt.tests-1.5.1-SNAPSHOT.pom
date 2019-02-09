@@ -1,10 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.ibm.wala</groupId>
+
+  <parent>
+    <artifactId>WALA</artifactId>
+    <groupId>com.ibm.wala</groupId>
+    <version>1.5.1-SNAPSHOT</version>
+  </parent>
+
   <artifactId>com.ibm.wala.ide.jsdt.tests</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>com.ibm.wala.ide.jsdt.tests</name>
-  <description/>
+  <packaging>eclipse-test-plugin</packaging>
+
+  <profiles>
+   <profile>
+    <id>macosx</id>
+    <activation>
+     <os>
+      <name>mac os x</name>
+      <family>mac</family>
+     </os>
+    </activation>
+    <properties>
+     <tycho.test.jvmArgs>-XstartOnFirstThread</tycho.test.jvmArgs>
+    </properties>
+   </profile>
+  </profiles>
+
+  <build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <configuration>
+	<reuseForks>false</reuseForks>
+        <forkCount>1</forkCount>
+       </configuration>
+    </plugin>
+  </plugins>
+  </build>
 </project>
