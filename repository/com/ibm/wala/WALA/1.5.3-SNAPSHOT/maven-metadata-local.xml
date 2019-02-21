@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.ibm.wala</groupId>
+  <artifactId>WALA</artifactId>
+  <version>1.5.3-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20190221161525</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.5.3-SNAPSHOT</value>
+        <updated>20190221161525</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
