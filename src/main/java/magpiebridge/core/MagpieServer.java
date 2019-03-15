@@ -135,7 +135,16 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
     }
     final ServerCapabilities caps = new ServerCapabilities();
     caps.setHoverProvider(true);
-    caps.setTextDocumentSync(TextDocumentSyncKind.Full);
+
+    caps.setTextDocumentSync(TextDocumentSyncKind.Incremental);
+	// TODO: Tried this to receive open/close events in VS Code, but didn't work:'
+	// (see https://stackoverflow.com/questions/55050629/language-server-how-to-enable-ondidopentextdocument-events)
+    //TextDocumentSyncOptions syncOptions = new TextDocumentSyncOptions();
+    //syncOptions.setOpenClose(true);
+    //caps.setTextDocumentSync(syncOptions);
+
+    caps.setDocumentHighlightProvider(true);
+
     CodeLensOptions cl = new CodeLensOptions();
     cl.setResolveProvider(true);
     caps.setCodeLensProvider(cl);

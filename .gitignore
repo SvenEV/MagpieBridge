@@ -19,3 +19,6 @@ target/test-classes/magpie/magpiebridge/AppTest\.class
 
 *.class
 /target/
+.idea/
+lsp/
+*.iml
