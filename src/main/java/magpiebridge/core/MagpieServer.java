@@ -1,20 +1,16 @@
 package magpiebridge.core;
 
 import com.ibm.wala.cast.tree.CAstSourcePositionMap.Position;
-import com.ibm.wala.cast.tree.impl.AbstractSourcePosition;
 import com.ibm.wala.classLoader.Module;
 import com.ibm.wala.classLoader.SourceFileModule;
 import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.io.TemporaryFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,8 +29,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import org.apache.commons.io.input.TeeInputStream;
-import org.apache.commons.io.output.TeeOutputStream;
 import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.Diagnostic;
@@ -44,10 +38,8 @@ import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.InitializedParams;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.MarkedString;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
@@ -60,9 +52,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 /**
- * 
  * @author Julian Dolby and Linghui Luo
- *
  */
 public class MagpieServer implements LanguageServer, LanguageClientAware {
   protected LanguageClient client;
@@ -92,12 +82,12 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
   }
 
   public void launchOnStdio() {
-    launchOnStream(logStream(System.in, "magpie.in"), logStream(System.out, "magpie.out"));
+    launchOnStream(Utils.logStream(System.in, "magpie.in"), Utils.logStream(System.out, "magpie.out"));
   }
 
   public void launchOnStream(InputStream in, OutputStream out) {
-    Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(this, logStream(in, "magpie.in"),
-        logStream(out, "magpie.out"), true, new PrintWriter(System.err));
+    Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(this, Utils.logStream(in, "magpie.in"),
+        Utils.logStream(out, "magpie.out"), true, new PrintWriter(System.err));
     connect(launcher.getRemoteProxy());
     launcher.startListening();
   }
@@ -105,9 +95,9 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
   public void launchOnSocketPort(String host, int port) {
     try {
       connectionSocket = new Socket(host, port);
-      Launcher<LanguageClient> launcher
-          = LSPLauncher.createServerLauncher(this, logStream(connectionSocket.getInputStream(), "magpie.in"),
-              logStream(connectionSocket.getOutputStream(), "magpie.out"));
+      Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(this,
+          Utils.logStream(connectionSocket.getInputStream(), "magpie.in"),
+          Utils.logStream(connectionSocket.getOutputStream(), "magpie.out"));
       connect(launcher.getRemoteProxy());
       launcher.startListening();
     } catch (IOException e) {
@@ -137,8 +127,8 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
     caps.setHoverProvider(true);
 
     caps.setTextDocumentSync(TextDocumentSyncKind.Incremental);
-	// TODO: Tried this to receive open/close events in VS Code, but didn't work:'
-	// (see https://stackoverflow.com/questions/55050629/language-server-how-to-enable-ondidopentextdocument-events)
+    // TODO: Tried this to receive open/close events in VS Code, but didn't work:'
+    // (see https://stackoverflow.com/questions/55050629/language-server-how-to-enable-ondidopentextdocument-events)
     //TextDocumentSyncOptions syncOptions = new TextDocumentSyncOptions();
     //syncOptions.setOpenClose(true);
     //caps.setTextDocumentSync(syncOptions);
@@ -206,7 +196,7 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
 
   /**
    * Add project service for different languages.
-   * 
+   *
    * @param language
    */
   public void addProjectService(String language, IProjectService projectService) {
@@ -273,12 +263,12 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
     Consumer<AnalysisResult> consumer = result -> {
       Diagnostic d = new Diagnostic();
       d.setMessage(result.toString(false));
-      d.setRange(getLocationFrom(result.position()).getRange());
+      d.setRange(Utils.getLocationFrom(result.position()).getRange());
       d.setSource(source);
       List<DiagnosticRelatedInformation> relatedList = new ArrayList<>();
       for (Pair<Position, String> related : result.related()) {
         DiagnosticRelatedInformation di = new DiagnosticRelatedInformation();
-        di.setLocation(getLocationFrom(related.fst));
+        di.setLocation(Utils.getLocationFrom(related.fst));
         di.setMessage(related.snd);
         relatedList.add(di);
       }
@@ -312,7 +302,7 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
       Either<String, MarkedString> content = Either.forLeft(result.toString(true));
       contents.add(content);
       hover.setContents(contents);
-      hover.setRange(getLocationFrom(result.position()).getRange());
+      hover.setRange(Utils.getLocationFrom(result.position()).getRange());
 
     };
     return consumer;
@@ -322,91 +312,10 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
     Consumer<AnalysisResult> consumer = result -> {
       CodeLens codeLens = new CodeLens();
 
-      codeLens.setRange(getLocationFrom(result.position()).getRange());
+      codeLens.setRange(Utils.getLocationFrom(result.position()).getRange());
 
     };
     return consumer;
-  }
-
-  protected Location getLocationFrom(Position pos) {
-    Location codeLocation = new Location();
-    try {
-      codeLocation.setUri(pos.getURL().toURI().toString());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
-    Range codeRange = new Range();
-    if (pos.getFirstCol() < 0) {
-      codeRange.setStart(getPositionFrom(pos.getFirstLine(), 0));// imprecise
-    } else {
-      codeRange.setStart(getPositionFrom(pos.getFirstLine(), pos.getFirstCol()));
-    }
-    if (pos.getLastLine() < 0) {
-      codeRange.setEnd(getPositionFrom(pos.getFirstLine() + 1, 0));// imprecise
-    } else {
-      codeRange.setEnd(getPositionFrom(pos.getLastLine(), pos.getLastCol()));
-    }
-    codeLocation.setRange(codeRange);
-    return codeLocation;
-  }
-
-  protected org.eclipse.lsp4j.Position getPositionFrom(int line, int column) {
-    org.eclipse.lsp4j.Position codeStart = new org.eclipse.lsp4j.Position();
-    codeStart.setLine(line - 1);
-    codeStart.setCharacter(column);
-    return codeStart;
-  }
-
-  protected Position lookupPos(org.eclipse.lsp4j.Position pos, URL url) {
-    return new AbstractSourcePosition() {
-
-      @Override
-      public int getFirstLine() {
-        // LSP is 0-based, but parsers mostly 1-based
-        return pos.getLine() + 1;
-      }
-
-      @Override
-      public int getLastLine() {
-        // LSP is 0-based, but parsers mostly 1-based
-        return pos.getLine() + 1;
-      }
-
-      @Override
-      public int getFirstCol() {
-        return pos.getCharacter();
-      }
-
-      @Override
-      public int getLastCol() {
-        return pos.getCharacter();
-      }
-
-      @Override
-      public int getFirstOffset() {
-        return -1;
-      }
-
-      @Override
-      public int getLastOffset() {
-        return -1;
-      }
-
-      @Override
-      public URL getURL() {
-        return url;
-      }
-
-      @Override
-      public Reader getReader() throws IOException {
-        return new InputStreamReader(url.openConnection().getInputStream());
-      }
-
-      @Override
-      public String toString() {
-        return url + ":" + getFirstLine() + "," + getFirstCol();
-      }
-    };
   }
 
   public Hover findHover(Position lookupPos) {
@@ -418,25 +327,4 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
     // TODO Auto-generated method stub
     return null;
   }
-
-  static InputStream logStream(InputStream is, String logFileName) {
-    File log;
-    try {
-      log = File.createTempFile(logFileName, ".txt");
-      return new TeeInputStream(is, new FileOutputStream(log));
-    } catch (IOException e) {
-      return is;
-    }
-  }
-
-  static OutputStream logStream(OutputStream os, String logFileName) {
-    File log;
-    try {
-      log = File.createTempFile(logFileName, ".txt");
-      return new TeeOutputStream(os, new FileOutputStream(log));
-    } catch (IOException e) {
-      return os;
-    }
-  }
-
 }
