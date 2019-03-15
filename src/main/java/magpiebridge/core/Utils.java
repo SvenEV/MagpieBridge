@@ -67,7 +67,7 @@ public final class Utils {
     return codeLocation;
   }
 
-  /** Creates an LSP {@link Position} from line and column. */
+  /** Creates an LSP {@link Position} from given line and column. */
   static Position getPositionFrom(int line, int column) {
     Position codeStart = new Position();
     codeStart.setLine(line - 1);
