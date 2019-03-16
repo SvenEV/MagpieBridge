@@ -2,12 +2,6 @@ package magpiebridge.core;
 
 import com.ibm.wala.cast.tree.CAstSourcePositionMap;
 import com.ibm.wala.cast.tree.impl.AbstractSourcePosition;
-import org.apache.commons.io.input.TeeInputStream;
-import org.apache.commons.io.output.TeeOutputStream;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,10 +11,14 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import org.apache.commons.io.input.TeeInputStream;
+import org.apache.commons.io.output.TeeOutputStream;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 public final class Utils {
-  private Utils() {
-  }
+  private Utils() {}
 
   /** Wraps an {@link InputStream} so that it writes any read data to a temporary file. */
   static InputStream logStream(InputStream is, String logFileName) {
@@ -54,12 +52,12 @@ public final class Utils {
     }
     Range codeRange = new Range();
     if (pos.getFirstCol() < 0) {
-      codeRange.setStart(getPositionFrom(pos.getFirstLine(), 0));// imprecise
+      codeRange.setStart(getPositionFrom(pos.getFirstLine(), 0)); // imprecise
     } else {
       codeRange.setStart(getPositionFrom(pos.getFirstLine(), pos.getFirstCol()));
     }
     if (pos.getLastLine() < 0) {
-      codeRange.setEnd(getPositionFrom(pos.getFirstLine() + 1, 0));// imprecise
+      codeRange.setEnd(getPositionFrom(pos.getFirstLine() + 1, 0)); // imprecise
     } else {
       codeRange.setEnd(getPositionFrom(pos.getLastLine(), pos.getLastCol()));
     }
@@ -75,7 +73,9 @@ public final class Utils {
     return codeStart;
   }
 
-  /** Converts an LSP {@link Position} (plus URL) to a WALA {@link CAstSourcePositionMap.Position}. */
+  /**
+   * Converts an LSP {@link Position} (plus URL) to a WALA {@link CAstSourcePositionMap.Position}.
+   */
   protected static CAstSourcePositionMap.Position lookupPos(Position pos, URL url) {
     return new AbstractSourcePosition() {
 

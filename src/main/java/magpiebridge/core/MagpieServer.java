@@ -28,7 +28,6 @@ import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-
 import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.Diagnostic;
@@ -129,7 +128,8 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
 
   /** Launch on stdio. */
   public void launchOnStdio() {
-    launchOnStream(Utils.logStream(System.in, "magpie.in"), Utils.logStream(System.out, "magpie.out"));
+    launchOnStream(
+        Utils.logStream(System.in, "magpie.in"), Utils.logStream(System.out, "magpie.out"));
   }
 
   /**
@@ -203,10 +203,11 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
 
     caps.setTextDocumentSync(TextDocumentSyncKind.Incremental);
     // TODO: Tried this to receive open/close events in VS Code, but didn't work:'
-    // (see https://stackoverflow.com/questions/55050629/language-server-how-to-enable-ondidopentextdocument-events)
-    //TextDocumentSyncOptions syncOptions = new TextDocumentSyncOptions();
-    //syncOptions.setOpenClose(true);
-    //caps.setTextDocumentSync(syncOptions);
+    // (see
+    // https://stackoverflow.com/questions/55050629/language-server-how-to-enable-ondidopentextdocument-events)
+    // TextDocumentSyncOptions syncOptions = new TextDocumentSyncOptions();
+    // syncOptions.setOpenClose(true);
+    // caps.setTextDocumentSync(syncOptions);
 
     caps.setDocumentHighlightProvider(true);
 
