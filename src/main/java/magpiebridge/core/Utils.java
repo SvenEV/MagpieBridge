@@ -21,7 +21,7 @@ public final class Utils {
   private Utils() {}
 
   /** Wraps an {@link InputStream} so that it writes any read data to a temporary file. */
-  static InputStream logStream(InputStream is, String logFileName) {
+  public static InputStream logStream(InputStream is, String logFileName) {
     File log;
     try {
       log = File.createTempFile(logFileName, ".txt");
@@ -32,7 +32,7 @@ public final class Utils {
   }
 
   /** Wraps an {@link OutputStream} so that it additionally writes to a temporary file. */
-  static OutputStream logStream(OutputStream os, String logFileName) {
+  public static OutputStream logStream(OutputStream os, String logFileName) {
     File log;
     try {
       log = File.createTempFile(logFileName, ".txt");
@@ -43,7 +43,7 @@ public final class Utils {
   }
 
   /** Converts a WALA {@link CAstSourcePositionMap.Position} to an LSP {@link Location}. */
-  static Location getLocationFrom(CAstSourcePositionMap.Position pos) {
+  public static Location getLocationFrom(CAstSourcePositionMap.Position pos) {
     Location codeLocation = new Location();
     try {
       codeLocation.setUri(pos.getURL().toURI().toString());
@@ -66,7 +66,7 @@ public final class Utils {
   }
 
   /** Creates an LSP {@link Position} from given line and column. */
-  static Position getPositionFrom(int line, int column) {
+  public static Position getPositionFrom(int line, int column) {
     Position codeStart = new Position();
     codeStart.setLine(line - 1);
     codeStart.setCharacter(column);
@@ -76,7 +76,7 @@ public final class Utils {
   /**
    * Converts an LSP {@link Position} (plus URL) to a WALA {@link CAstSourcePositionMap.Position}.
    */
-  protected static CAstSourcePositionMap.Position lookupPos(Position pos, URL url) {
+  public static CAstSourcePositionMap.Position lookupPos(Position pos, URL url) {
     return new AbstractSourcePosition() {
 
       @Override
