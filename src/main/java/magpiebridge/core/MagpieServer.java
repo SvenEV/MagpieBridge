@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -201,7 +202,7 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
     final ServerCapabilities caps = new ServerCapabilities();
     caps.setHoverProvider(true);
 
-    caps.setTextDocumentSync(TextDocumentSyncKind.Incremental);
+    caps.setTextDocumentSync(TextDocumentSyncKind.Full);
     // TODO: Tried this to receive open/close events in VS Code, but didn't work:'
     // (see
     // https://stackoverflow.com/questions/55050629/language-server-how-to-enable-ondidopentextdocument-events)
@@ -388,6 +389,20 @@ public class MagpieServer implements LanguageServer, LanguageClientAware {
         default:
           break;
       }
+    }
+  }
+
+  /**
+   * Removes all diagnostics for the given file. On the client, this will only have an effect when
+   * new diagnostics are published.
+   *
+   * @param url
+   */
+  public void clearDiagnostics(String url, String source) {
+    try {
+      // HACK to work around inconsistent file URLs
+      this.diagnostics.remove(new URL(url.replace("file:///", "file://")));
+    } catch (MalformedURLException ignored) {
     }
   }
 
